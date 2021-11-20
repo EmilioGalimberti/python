@@ -37,5 +37,5 @@ jobs:
         with:
           #secret code github /underscore accees /underscore token to the repo https://docs.github.com/es/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
 
-          github_token: ${{ secrets.GH_ACCES_TOKE }}
+          github_token: ${{ secrets.GH_ACCES_TOKEN }}
           branch: ${{ github.ref }}

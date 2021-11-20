@@ -39,3 +39,7 @@ jobs:
 
           github_token: ${{ secrets.GH_ACCES_TOKEN }}
           branch: ${{ github.ref }}
+
+#pylinter github action that uses three linting packages flakegate,mypi and isort
+#https://www.youtube.com/watch?v=oi94qEvi9Qo&t=74s
+#https://github.com/marketplace/actions/pylinter

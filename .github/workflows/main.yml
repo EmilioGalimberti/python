@@ -1,1 +1,30 @@
 
+name: CI for py
+
+on: [push, pull_request]
+
+jobs:
+# applying the ci workflow to out repository and checking all the linters that we have
+  python-lint:
+    runs-on: ubuntu-latest
+    steps:
+# actions/checkout@v2 do simply checks out the code from the repo so we can run associated actions later on as well
+      - name: checkout source repo
+        uses: actions/checkout@v2
+
+# github action we're going to be using is  alexanderdamiani/pylinter@v1.0.0  (pylinter)
+      - name: linting
+        uses: alexanderdamiani/pylinter@v1.0.0
+        with:
+          python-root: '.'
+          flake8-flags: ''
+          mypy-flags: ''
+          fail-on-isort: true
+  
+  # auto commit and auto push of changes made by our ci workflow to hte repository
+  #isort is doing is simply sorting the imports of the repository in alphabetical order
+  #    - name: commit isort changes
+  #      run: |
+  #        git config --local user.email "ction@github.com"
+  #        git conding --local user.name "GitHub Action"
+  #        git add -A && git diff-index --cached --quiet HEAD || git commit -m 'isort'

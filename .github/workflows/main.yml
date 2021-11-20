@@ -19,12 +19,23 @@ jobs:
           python-root: '.'
           flake8-flags: ''
           mypy-flags: ''
-          fail-on-isort: true
+          fail-on-isort: false
   
-  # auto commit and auto push of changes made by our ci workflow to hte repository
+  #flake8, mypy, they'are a little too complex to apply changes automatically but isrot is much mor simplistic all its doing is sorting the imports alphabetically automatically
+  
+  # auto commit and auto push of changes made by our ci workflow to the repository when it encounters work changes that need to be made
   #isort is doing is simply sorting the imports of the repository in alphabetical order
-  #    - name: commit isort changes
-  #      run: |
-  #        git config --local user.email "ction@github.com"
-  #        git conding --local user.name "GitHub Action"
-  #        git add -A && git diff-index --cached --quiet HEAD || git commit -m 'isort'
+  
+      - name: commit isort changes
+        run: |
+          git config --local user.email "ction@github.com"
+          git conding --local user.name "GitHub Action"
+          git add -A && git diff-index --cached --quiet HEAD || git commit -m 'isort'
+          
+      - name: push isort changes
+        uses: ad-m/github-push-action@v0.5.0
+        with:
+          #secret code github /underscore accees /underscore token to the repo https://docs.github.com/es/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
+
+          github_token: ${{ secrets.GH_ACCES_TOKE }}
+          branch: ${{ github.ref }}

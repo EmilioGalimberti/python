@@ -1,31 +1,51 @@
 
 name: CI for py
 
-on: [push, pull_request]
 
-jobs:
-# applying the ci workflow to out repository and checking all the linters that we have
-  python-lint:
-    runs-on: ubuntu-latest
-    steps:
-# actions/checkout@v2 do simply checks out the code from the repo so we can run associated actions later on as well
-      - name: checkout source repo
-        uses: actions/checkout@v2
+on: # Triggers the workflow on push or pull request events but only for the main branch.  
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
-# github action we're going to be using is  alexanderdamiani/pylinter@v1.0.0  (pylinter)
+
+jobs: # Una ejecución de flujo de trabajo se compone de uno o más trabajos que pueden ejecutarse secuencialmente o en paralelo.
+  build: # Define el nombre del job.
+    runs-on: ubuntu-latest # Configura el job para ejecutarse en un ejecutor Ubuntu Linux. Esto significa que el job se ejecutará en una máquina virtual nueva que se hospede en GitHub. 
+    steps: # Los pasos representan una secuencia de tareas que se ejecutarán como parte del trabajo.
+
+#La palabra clave uses le dice al job que recupere la v2 de la acción comunitaria que se llama actions/checkout@v2. 
+#Esta es una acción que revisa tu repositorio y lo descarga al ejecutor, lo que te permite ejecutar acciones contra tu código (tales como las herramientas de prueba). 
+#Debes utilizar la acción de verificación cada que tu flujo de trabajo se ejecute contra el código del repositorio o cada que estés utilizando una acción definida en el 
+#repositorio.      
+      - uses: actions/checkout@v2 # actions/checkout@v2 do simply checks out the code from the repo so we can run associated actions later on as well.
+      - name: Set up Python 3.9 # Set up version python for use
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Install dependencies
+      # first upgrade pip, install flake 8 and pytest , finally instal requierments from our requirements.txt
+        run: |
+          python -m pip install --upgrade pip 
+          pip install flake8 pytest
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+ 
+ 
+# applying the ci workflow to out repository and checking all the linters that we have 
       - name: linting
-        uses: alexanderdamiani/pylinter@v1.0.0
+        uses: alexanderdamiani/pylinter@v1.0.0 # github action we're going to be using is  alexanderdamiani/pylinter@v1.0.0  (pylinter).
         with:
           python-root: '.'
           flake8-flags: ''
-          mypy-flags: ''
+          mypy-flags: '--ignore-missing-imports'
           fail-on-isort: false
+          skip-flake8: true
+  
   
   #flake8, mypy, they'are a little too complex to apply changes automatically but isrot is much mor simplistic all its doing is sorting the imports alphabetically automatically
-  
+
   # auto commit and auto push of changes made by our ci workflow to the repository when it encounters work changes that need to be made
-  #isort is doing is simply sorting the imports of the repository in alphabetical order
-  
+  #isort is doing is simply sorting the imports of the repository in alphabetical order  
       - name: commit isort changes
         run: |
           git config --local user.email "action@github.com"
@@ -36,10 +56,18 @@ jobs:
         uses: ad-m/github-push-action@v0.5.0
         with:
           #secret code github /underscore accees /underscore token to the repo https://docs.github.com/es/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
-
           github_token: ${{ secrets.GH_ACCES_TOKEN }}
           branch: ${{ github.ref }}
 
 #pylinter github action that uses three linting packages flakegate,mypi and isort
 #https://www.youtube.com/watch?v=oi94qEvi9Qo&t=74s
 #https://github.com/marketplace/actions/pylinter
+
+  test: # Define el nombre del job.
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test with pytest
+        run: |
+          # calling via python will also add the current directory to sys.path
+          python -m pytest

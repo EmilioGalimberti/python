@@ -10,25 +10,16 @@ on: # Triggers the workflow on push or pull request events but only for the main
 
 
 jobs: # Una ejecución de flujo de trabajo se compone de uno o más trabajos que pueden ejecutarse secuencialmente o en paralelo.
-  build: # Define el nombre del job.
+  python-lint: # Define el nombre del job.
     runs-on: ubuntu-latest # Configura el job para ejecutarse en un ejecutor Ubuntu Linux. Esto significa que el job se ejecutará en una máquina virtual nueva que se hospede en GitHub. 
     steps: # Los pasos representan una secuencia de tareas que se ejecutarán como parte del trabajo.
-
+      - name: checkout source repo
+        uses: actions/checkout@v2
 #La palabra clave uses le dice al job que recupere la v2 de la acción comunitaria que se llama actions/checkout@v2. 
 #Esta es una acción que revisa tu repositorio y lo descarga al ejecutor, lo que te permite ejecutar acciones contra tu código (tales como las herramientas de prueba). 
 #Debes utilizar la acción de verificación cada que tu flujo de trabajo se ejecute contra el código del repositorio o cada que estés utilizando una acción definida en el 
 #repositorio.      
-      - uses: actions/checkout@v2 # actions/checkout@v2 do simply checks out the code from the repo so we can run associated actions later on as well.
-      - name: Set up Python 3.9 # Set up version python for use
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.9
-      - name: Install dependencies
-      # first upgrade pip, install flake 8 and pytest , finally instal requierments from our requirements.txt
-        run: |
-          python -m pip install --upgrade pip 
-          pip install flake8 pytest
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
  
  
 # applying the ci workflow to out repository and checking all the linters that we have 
@@ -63,10 +54,22 @@ jobs: # Una ejecución de flujo de trabajo se compone de uno o más trabajos que
 #https://www.youtube.com/watch?v=oi94qEvi9Qo&t=74s
 #https://github.com/marketplace/actions/pylinter
 
-  test: # Define el nombre del job.
-    needs: build
+  build_and_test: # Define el nombre del job.
+    needs: python-lint
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2 # actions/checkout@v2 do simply checks out the code from the repo so we can run associated actions later on as well.
+      - name: Set up Python 3.9 # Set up version python for use
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Install dependencies
+      # first upgrade pip, install flake 8 and pytest , finally instal requierments from our requirements.txt
+        run: |
+          python -m pip install --upgrade pip 
+          pip install flake8 pytest
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
       - name: Test with pytest
         run: |
           # calling via python will also add the current directory to sys.path

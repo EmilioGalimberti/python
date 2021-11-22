@@ -1,7 +1,7 @@
 import math
 
 
-def add(a, b) -> int:#probando si linting sigue funcionado
+def add(a, b) -> int:
     return math.floor(a + b)
 
 

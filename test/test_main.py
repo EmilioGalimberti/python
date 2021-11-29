@@ -9,6 +9,6 @@ def test_add():  # test must be used  and use the same name.
 
 
 def test_to_sentence():
-    assert main.to_sentence('apple') == 'Apple.'  # Expected output.
+    assert main.to_sentence('apple') == 'Orange.'  # Expected output.
     assert main.to_sentence('Apple trees') == 'Apple trees.'
     assert main.to_sentence('Apple trees.') == 'Apple trees.'
